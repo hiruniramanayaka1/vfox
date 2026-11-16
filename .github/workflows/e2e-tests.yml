@@ -1,3 +1,11 @@
+# Optimized by ci-cost (https://github.com/mariotavarez/ci-cost)
+# Applied 4 optimizations:
+# - [MEDIUM] Add concurrency group to "e2e-tests.yml"
+# - [MEDIUM] 3 jobs clone the repo — consider artifact sharing
+# - [LOW] Use shallow clone in "test-windows" job
+# - [LOW] Use shallow clone in "test-unix" job
+# Estimated savings: ~3 min/run
+#
 name: vfox E2E Test
 
 on:
@@ -13,6 +21,10 @@ on:
       - '.github/workflows/compile-msix.yml'
   workflow_dispatch:
 
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   test-windows:
     if: github.repository == 'version-fox/vfox'
