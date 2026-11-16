@@ -34,6 +34,14 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
 
+      - name: Cache Go modules
+        uses: actions/cache@v4
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('go.mod', 'go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
       - name: Check Go installation
         run: go version
 
@@ -48,7 +56,7 @@ jobs:
           $ErrorActionPreference = "Stop"
           
           # Run the E2E test script
-          & .\scripts\e2e-test.ps1 -Verbose
+          & .\\scripts\\e2e-test.ps1 -Verbose
         env:
           VFOX_HOME: ${{ runner.temp }}\.vfox
 
@@ -73,6 +81,13 @@ jobs:
         uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
+      - name: Cache Go modules
+        uses: actions/cache@v4
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('go.mod', 'go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
       - name: Check Go installation
         run: go version
       # Build, pack, sign, install and verify the .msixbundle end-to-end
@@ -81,7 +96,7 @@ jobs:
         run: |
           cd ${{ github.workspace }}
           $ErrorActionPreference = "Stop"
-          & .\scripts\e2e-msix-test.ps1
+          & .\\scripts\\e2e-msix-test.ps1
         env:
           VFOX_HOME: ${{ runner.temp }}\.vfox
       - name: Upload test results
@@ -111,6 +126,14 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: ${{ matrix.go-version }}
+
+      - name: Cache Go modules
+        uses: actions/cache@v4
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('go.mod', 'go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
 
       - name: Check Go installation
         run: go version
@@ -144,7 +167,7 @@ jobs:
       - name: Print summary
         run: |
           echo "E2E Tests Summary"
-          echo "================"
+          echo "================="
           echo "Windows tests: $(ls -d test-results-windows-* 2>/dev/null | wc -l) platform(s)"
           echo "MSIX packaging tests: $(ls -d test-results-msix-windows-* 2>/dev/null | wc -l) platform(s)"
           echo "Unix tests: $(ls -d test-results-* 2>/dev/null | grep -v windows | wc -l) platform(s)"
